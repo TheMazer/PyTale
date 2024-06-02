@@ -9,7 +9,7 @@ class SpellMap:
         self.resizingSpeed = 4
         self.width = 0
         self.height = 0
-        self.rect = pygame.Rect(321 - self.width / 2, 281 - self.height / 2, self.width, self.height)
+        self.rect = pygame.Rect(321 - self.width / 2, 300 - self.height / 2, self.width, self.height)
 
     def resizing(self):
         mapSize = self.battleClass.mapSize
@@ -29,5 +29,5 @@ class SpellMap:
         self.resizing()
 
     def draw(self, displaySurface):
-        self.rect = pygame.Rect(321 - self.width / 2, 281 - self.height / 2, self.width, self.height)
+        self.rect = pygame.Rect(321 - self.width / 2, 300 - self.height / 2, self.width, self.height)
         pygame.draw.rect(displaySurface, 'White', self.rect, 5)

@@ -12,3 +12,4 @@ fps = 60
 # Fonts
 statusFont = pygame.font.Font('assets/fonts/mars.ttf', 24)
 tipFont = pygame.font.Font('assets/fonts/8bitwonder.otf', 12)
+dialogueFont = pygame.font.Font('assets/fonts/determination.otf', 26)

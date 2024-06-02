@@ -28,6 +28,7 @@ class Game:
             start_time = time.time()
             dt = self.clock.tick(fps)
             self.currentStage.run(dt)
+            self.screen.blit(statusFont.render(str(fpsCounter), False, 'Lime'), (16, 16))
 
             pygame.display.flip()
 
