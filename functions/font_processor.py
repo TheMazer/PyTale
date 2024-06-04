@@ -60,6 +60,8 @@ class DialogueFont:
             if notEnd: break
             self.done = True
 
+            # Todo: For multiple messages create callback
+
 
 class OptionFont(DialogueFont):
     def __init__(self, *text):

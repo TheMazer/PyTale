@@ -9,10 +9,22 @@ class Soul(pygame.sprite.Sprite):
         super().__init__()
         self.mapSize = battleClass.mapSize
         self.spellMap = battleClass.spellMap
-        self.image = pygame.image.load('assets/images/gui/soul/red.png')
+        self.image = pygame.image.load('assets/images/soul/red.png')
         self.rect = self.image.get_rect()
         self.hitbox = pygame.Rect(0, 0, 8, 8)
         self.hitbox.center = self.spellMap.rect.center
+
+        # Stats
+        self.lv = 19
+        self.weapon = ('Real Knife', 99)
+        self.armor = ('The Locket', 99)
+
+        self.maxHp = 4 * self.lv + 16
+        self.atk = 2 * (self.lv - 1) + self.weapon[1]
+        self.df = (self.lv - 1) // 4
+
+        self.hp = self.maxHp
+        self.inventory = []
 
         # Controls
         self.controllability = True
