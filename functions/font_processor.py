@@ -12,11 +12,16 @@ class DialogueFont:
         self.printingSpeed = 3
         self.printingSound = pygame.mixer.Sound('assets/sounds/generic_speech.wav')
         self.printingSound.set_volume(.5)
+        self.commandSymbol = False
+        self.color = 'White'
 
         # Dotting
         formattedText = ""
         for paragraph in text:
-            formattedText += f"* {paragraph}\n"
+            if paragraph.startswith("~"):
+                formattedText += f"{paragraph[:2]}* {paragraph[2:]}\n"
+            else:
+                formattedText += f"* {paragraph}\n"
 
         # Wrapping Text
         lines = []
@@ -26,14 +31,21 @@ class DialogueFont:
             lines.extend(par)
 
         for line in lines:
-            if not line.startswith('* '): line = '  ' + line
+            if not (line.startswith('* ') or line.startswith('~')):
+                line = '  ' + line
             self.lines.append([])
 
             # Rendering Surfaces
             for char in line:
-                if char == "\n": self.lines.append([])
-                else: self.lines[-1].append([dialogueFont.render(char, False, 'White'), char])
-                self.printingPos.append(0)
+                if self.commandSymbol:
+                    self.commandSymbol = False
+                    if char == 'Y':
+                        self.color = 'Yellow'
+                else:
+                    if char == "\n": self.lines.append([])
+                    elif char == "~": self.commandSymbol = True
+                    else: self.lines[-1].append([dialogueFont.render(char, False, self.color), char])
+                    self.printingPos.append(0)
 
     def render(self, surf: pygame.Surface, pos):
         offsetY = 0

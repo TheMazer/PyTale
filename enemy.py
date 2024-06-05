@@ -1,6 +1,8 @@
 from settings import *
 
+import random
 from functions.import_folder import importFolder
+from attacks.snakes import SnakesAttack
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -34,6 +36,7 @@ class Pyhtoncheg(Enemy):
         self.animationSpeed = 0.5
         self.frameIndex = 0
         self.image = self.frames[self.frameIndex]
+        self.battleClass = battleClass
 
         self.offsetX = 0
         self.rect = self.image.get_rect()
@@ -53,7 +56,7 @@ class Pyhtoncheg(Enemy):
         self.maxHp = 350
         self.hp = 350
         self.atk = 16
-        self.df = 20
+        self.df = 60
 
     def act(self, type):
         if type == 'Проверить':
@@ -67,6 +70,12 @@ class Pyhtoncheg(Enemy):
         elif type == 'Программировать':
             self.sendMessage('Вы программируете на Python.\nУ вас ужасно получается.', 'Питон хочет прекратить битву.')
             self.acts.remove(type)
+            self.canSpare = True
+
+    def turn(self):
+        attackType = random.choice(['Snakes'])
+        if attackType == 'Snakes':
+            SnakesAttack(self.battleClass)
 
     def animate(self):
         if self.offsetX != 0:

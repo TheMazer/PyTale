@@ -39,7 +39,7 @@ class TargetLine(pygame.sprite.Sprite):
 
     def getInput(self):
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_RETURN]:
+        if keys[pygame.K_RETURN] and not self.pressed:
             self.slashSound.play()
             accuracy = abs(self.rect.center[0] - 320)
             accMult = 2.2 if accuracy <= 12 else (273 - accuracy) / 273 * 2

@@ -1,6 +1,7 @@
 import pygame
 
 from settings import *
+from functions.import_folder import importFolder
 
 
 class Soul(pygame.sprite.Sprite):
@@ -9,7 +10,13 @@ class Soul(pygame.sprite.Sprite):
         super().__init__()
         self.mapSize = battleClass.mapSize
         self.spellMap = battleClass.spellMap
-        self.image = pygame.image.load('assets/images/soul/red.png')
+
+        self.defImage = pygame.image.load('assets/images/soul/red.png')
+        self.invincibilityFrames = importFolder('assets/images/soul')
+        self.image = self.defImage
+        self.animationSpeed = 0.1
+        self.frameIndex = 0
+
         self.rect = self.image.get_rect()
         self.hitbox = pygame.Rect(0, 0, 8, 8)
         self.hitbox.center = self.spellMap.rect.center
@@ -22,14 +29,25 @@ class Soul(pygame.sprite.Sprite):
         self.maxHp = 4 * self.lv + 16
         self.atk = 2 * (self.lv - 1) + self.weapon[1]
         self.df = (self.lv - 1) // 4
+        self.invincibilityTime = fps * 2
 
         self.hp = self.maxHp
         self.inventory = []
 
         # Controls
-        self.controllability = True
         self.direction = pygame.Vector2()
+        self.controllability = True
+        self.invincibility = 0
         self.speed = 2
+
+        # Sounds
+        self.hurtSound = pygame.mixer.Sound('assets/sounds/hurt.wav')
+
+    def hit(self, damage):
+        if not self.invincibility:
+            self.invincibility = self.invincibilityTime
+            self.hp = max(self.hp - max(damage - self.df, 0), 0)
+            self.hurtSound.play()
 
     def movement(self):
         self.getInput()
@@ -54,6 +72,15 @@ class Soul(pygame.sprite.Sprite):
             self.rect.bottom = self.spellMap.rect.bottom - 5
             self.hitbox.centery = self.rect.centery
 
+    def animate(self):
+        if self.invincibility:
+            self.frameIndex += self.animationSpeed
+            if self.frameIndex >= len(self.invincibilityFrames):
+                self.frameIndex = 0
+            self.image = self.invincibilityFrames[int(self.frameIndex)]
+        else:
+            self.image = self.defImage
+
     def getInput(self):
         self.direction.x = 0
         self.direction.y = 0
@@ -71,4 +98,7 @@ class Soul(pygame.sprite.Sprite):
                 self.direction.y += 1
 
     def update(self):
+        self.animate()
         self.movement()
+        if self.invincibility > 0:
+            self.invincibility -= 1

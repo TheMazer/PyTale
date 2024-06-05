@@ -29,10 +29,12 @@ class Battle:
 
         # Enemy
         self.enemy = Pyhtoncheg(self)
-        self.enemySelect = [OptionFont(self.enemy.name)]  # Name of one enemy by now
+        self.enemySelect = [OptionFont(('~Y' if self.enemy.canSpare else '') + self.enemy.name)]  # Name of one enemy by now
         self.acts = [OptionFont(option) for option in self.enemy.acts]
         self.acts.insert(0, OptionFont('Проверить'))
         self.lastHpProgress = self.enemy.hp / self.enemy.maxHp * 100
+        self.attacks = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
 
         # Gui
         self.name = statusFont.render('Chara', False, 'White')
@@ -69,9 +71,11 @@ class Battle:
 
     def enableMenu(self):
         self.menuEnabled = True
+        self.soul.invincibility = 0
+        self.soul.image = self.soul.defImage
         self.resizeMap(575, 140)
         if self.enemy.firstStatusMessages: statusMessage = self.enemy.firstStatusMessages
-        else: statusMessage = [self.enemy.name + ' приближается.']
+        else: statusMessage = [self.enemy.name + random.choice([' приближается.', ' появился на горизонте.'])]
         self.menuDialogue = DialogueFont(*statusMessage)
         self.buttons[self.selected].hover(1)
 
@@ -81,8 +85,12 @@ class Battle:
         self.messageSent = False
         self.battleEnded = False
         self.enemySelected = None
-        self.resizeMap(165, 140)
+        self.soul.invincibility = 0
+        self.soul.image = self.soul.defImage
         self.buttons[self.selected].hover(0)
+        [self.bullets.remove(bullet) for bullet in self.bullets]
+        self.enemySelect = [OptionFont(('~Y' if self.enemy.canSpare else '') + self.enemy.name)]
+        self.enemy.turn()
 
     def resizeMap(self, width, height, instant = False):
         self.mapSize = (width, height)
@@ -266,8 +274,9 @@ class Battle:
             self.displaySurface.blit(button.image, button.rect)
 
         # Enemy
-        self.enemy.update()
-        self.displaySurface.blit(self.enemy.image, self.enemy.rect)
+        if not self.battleEnded:
+            self.enemy.update()
+            self.displaySurface.blit(self.enemy.image, self.enemy.rect)
 
         # Spell Map Processing
         self.spellMap.update()
@@ -278,7 +287,24 @@ class Battle:
             self.menuProcessing()
         else:
             self.soul.update()
+            self.attacks.update()
+            self.bullets.update()
             self.displaySurface.blit(self.soul.image, self.soul.rect)
+
+            attacksSurf = pygame.Surface(screenSize)
+            for bullet in self.bullets:
+                # This to Draw Bullets' Hitboxes
+                # pygame.draw.rect(self.displaySurface, 'Cyan', bullet.rect)
+                attacksSurf.blit(bullet.image, bullet.rect)
+                if self.soul.hitbox.colliderect(bullet.rect):
+                    self.soul.hit(self.enemy.atk)
+            subRect = self.spellMap.rect
+            subRect.topleft += pygame.Vector2(5, 5)
+            subRect.size -= pygame.Vector2(10, 10)
+            attacksSurf = attacksSurf.subsurface(subRect)
+            attacksSurf.set_colorkey('Black')
+            self.displaySurface.blit(attacksSurf, subRect.topleft)
+            # This to drawPlayer's Hitbox
             # pygame.draw.rect(self.displaySurface, 'Yellow', self.soul.hitbox)
 
         keys = pygame.key.get_just_pressed()
