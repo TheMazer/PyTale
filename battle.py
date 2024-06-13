@@ -1,7 +1,5 @@
 import math
 
-import pygame
-
 from settings import *
 import random
 
@@ -35,6 +33,7 @@ class Battle:
         self.lastHpProgress = self.enemy.hp / self.enemy.maxHp * 100
         self.attacks = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
+        self.misc = pygame.sprite.Group()
 
         # Gui
         self.name = statusFont.render('Chara', False, 'White')
@@ -74,6 +73,8 @@ class Battle:
         self.soul.invincibility = 0
         self.soul.image = self.soul.defImage
         self.resizeMap(575, 140)
+        [self.bullets.remove(bullet) for bullet in self.bullets]
+        [self.attacks.remove(attack) for attack in self.attacks]
         if self.enemy.firstStatusMessages: statusMessage = self.enemy.firstStatusMessages
         else: statusMessage = [self.enemy.name + random.choice([' приближается.', ' появился на горизонте.'])]
         self.menuDialogue = DialogueFont(*statusMessage)
@@ -85,10 +86,8 @@ class Battle:
         self.messageSent = False
         self.battleEnded = False
         self.enemySelected = None
-        self.soul.invincibility = 0
-        self.soul.image = self.soul.defImage
         self.buttons[self.selected].hover(0)
-        [self.bullets.remove(bullet) for bullet in self.bullets]
+        self.soul.hitbox.center = self.spellMap.rect.center
         self.enemySelect = [OptionFont(('~Y' if self.enemy.canSpare else '') + self.enemy.name)]
         self.enemy.turn()
 
@@ -273,6 +272,9 @@ class Battle:
         for button in self.buttons:
             self.displaySurface.blit(button.image, button.rect)
 
+        self.misc.update()
+        self.misc.draw(self.displaySurface)
+
         # Enemy
         if not self.battleEnded:
             self.enemy.update()
@@ -309,7 +311,7 @@ class Battle:
 
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_f]:
-            self.resizeMap(random.randint(50, 600), random.randint(50, 400))
+            self.resizeMap(random.randint(50, 600), random.randint(50, 350))
         elif keys[pygame.K_t]:
             self.enableMenu()
         elif keys[pygame.K_m]:

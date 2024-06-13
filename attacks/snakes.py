@@ -38,9 +38,11 @@ class SnakesAttack(pygame.sprite.Sprite):
         snake.direction = direction
 
     def update(self):
+        # Spawn Snake every second
         if self.frame % fps == 0:
             self.spawnSnake()
 
+        # End Attack after 9 seconds
         if self.frame >= fps * 9 + 20:
             self.battleClass.enableMenu()
             self.kill()

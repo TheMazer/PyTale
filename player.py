@@ -38,6 +38,7 @@ class Soul(pygame.sprite.Sprite):
         self.direction = pygame.Vector2()
         self.controllability = True
         self.invincibility = 0
+        self.precision = False
         self.speed = 2
 
         # Sounds
@@ -51,7 +52,7 @@ class Soul(pygame.sprite.Sprite):
 
     def movement(self):
         self.getInput()
-        self.hitbox.topleft += self.direction * self.speed
+        self.hitbox.topleft += self.direction * self.speed * (0.5 if self.precision else 1)
         self.rect.center = self.hitbox.center
         self.mapRestriction()
 
@@ -96,6 +97,8 @@ class Soul(pygame.sprite.Sprite):
                 self.direction.y -= 1
             if keys[pygame.K_s]:
                 self.direction.y += 1
+
+            self.precision = keys[pygame.K_x]
 
     def update(self):
         self.animate()

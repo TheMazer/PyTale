@@ -1,6 +1,6 @@
 from settings import *
 
-from random import randint
+from random import randint, choice
 from functions.import_folder import importFolder
 
 
@@ -15,7 +15,9 @@ class TargetLine(pygame.sprite.Sprite):
 
         self.image = self.frames[self.frameIndex]
         self.rect = self.image.get_rect()
-        self.rect.topleft = (38, 235)
+        self.direction = choice([-1, 1])
+        if self.direction > 0: self.rect.topleft = (38, 235)
+        else: self.rect.topright = (602, 235)
 
         self.pressed = False
         self.done = False
@@ -23,8 +25,25 @@ class TargetLine(pygame.sprite.Sprite):
         self.speed = 0
 
     def move(self):
-        self.rect.x += self.speed
+        self.rect.x += self.speed * self.direction
         if self.speed < 8: self.speed += 0.5
+        if self.rect.right > 602 or self.rect.left < 38:
+            dealtDamageLabel = damageFont.render('ПР0МАХ', False, '#bfbfbf')
+            dealtDamageFill = damageFillFont.render('ПР0МАХ', False, 'Black')
+            missImage = pygame.Surface(dealtDamageLabel.get_size(), pygame.SRCALPHA)
+            missImage.blit(dealtDamageLabel, (1, 1))
+            missImage.blit(dealtDamageFill, (1, 12))
+
+            missTip = pygame.sprite.Sprite()
+            missTip.image = missImage
+            missTip.rect = missImage.get_rect()
+            missTip.rect.topleft = (screenSize[0] / 2 - dealtDamageLabel.get_width() / 2, self.battleClass.enemy.rect.top - 40)
+
+            missTip.update = lambda: (setattr(missTip, 'frame', getattr(missTip, 'frame', 0) + 1),
+                                      missTip.kill() if getattr(missTip, 'frame', 0) >= fps * 2 else None)
+
+            self.battleClass.misc.add(missTip)
+            self.done = True
 
     def animate(self):
         self.frameIndex += self.animationSpeed
@@ -78,7 +97,9 @@ class TargetLine(pygame.sprite.Sprite):
 
         self.image = self.frames[self.frameIndex]
         self.rect = self.image.get_rect()
-        self.rect.topleft = (38, 235)
+        self.direction = choice([-1, 1])
+        if self.direction > 0: self.rect.topleft = (38, 235)
+        else: self.rect.topright = (602, 235)
 
         self.pressed = False
         self.done = False
